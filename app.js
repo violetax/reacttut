@@ -1,14 +1,26 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-
-var indexRouter = require('./routes/index');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const bodyParser = require('body-parser');  // eslint-disable-line
+const mongoose = require('mongoose');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const expressSession = require('express-session')({
+  secret: 'any random string can go here',
+  resave: false,
+  saveUninitialized: false,
+});
+// Configure Passport
+const User = require('./models/user');
+const indexRouter = require('./routes/index');
 const api = require('./routes/api/index');
-//var usersRouter = require('./routes/users');
+const users = require('./routes/api/users');
 
-var app = express();
+const app = express();
+// Connect Mongoose
+mongoose.connect('mongodb://localhost/userlist');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -18,11 +30,21 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(expressSession);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/api', api);
-//app.use('/users', usersRouter);
+// app.use('/users', usersRouter);
+app.use('/api/users', users);
+
+
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

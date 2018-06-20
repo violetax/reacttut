@@ -1,0 +1,10 @@
+ins
+fin
+finp
+upna
+upem
+rena
+reem
+ 
+mongo userlist --eval "db.users.find().pretty()"
+db.users.find().pretty()

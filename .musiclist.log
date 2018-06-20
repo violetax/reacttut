@@ -1,3 +1,123 @@
 ##LEntry 1: Thu 14 Jun 2018 22:53:21 CEST
  
 Edited index.js 2 var to const, and use of arrow function
+ 
+##LEntry 2: Fri 15 Jun 2018 00:28:54 CEST
+
+mkdir _dirbase/models 
+vim /models/user.js (mongoose.schema) 
+ 
+##LEntry 3: Mon 18 Jun 2018 19:41:08 CEST
+ 
+g package.json
+ADD: 
+express-session": "1.10.1", ^companion module that’ll help us manage user sessions across page and API requests
+(under the “morgan” line)
+"passport": "0.3.2", ^handles authentication of requests; 
+"passport-local": "1.0.0", ^ tie that authentication into Express
+"passport-local-mongoose": "4.0.0", ^simplifies talking to our database when logging in with a username and password
+ 
+##LEntry 4: Mon 18 Jun 2018 19:45:20 CEST
+ 
+g /app.js
+(below the line where we require mongoose)
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy; ^bringing in Passport and also a “Strategy” constructor from Passport-Local, which is an approach for connecting Express to our authentication setup
+(he big block of app.use, under the cookie parser bit )
+app.use(require(' express-session')({
+  secret: ány random string can go here', ^Your “secret” is used to create a hash with which session requests are “signed” so that the server knows they’re coming from the right place
+^PENDING before  go live set up to avoid Keeping such secrets in your github repo, even a private one
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session()); ^tell our app to use the Express Session middleware along with Passport, including Passport’s session management
+(under API route)
+// Configure Passport
+const User = require('./models/user');
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+g /models/user.js
+
+const passportLocalMongoose = require('passport-local-mongoose');
+(after model definition)
+User.plugin(passportLocalMongoose);
+REMOVE:   password: string,
+ 
+##LEntry 5: Tue 19 Jun 2018 15:34:13 CEST
+ 
+g create a new file  in the same folder as whatever they’re testing. In this case, that’s our /routes/api: 
+vim /routes/api/users.test.js
+ 
+##LEntry 6: Tue 19 Jun 2018 15:54:57 CEST
+ 
+g package.json:
+	scripts: ... "test": "jest"
+ 
+##LEntry 7: Tue 19 Jun 2018 16:07:05 CEST
+ 
+g create  the API endpoint the testwill test
+
+vim /routes/api/users.js
+
+g set up API to listen for requests at /api/users/list 
+
+router.get('/list', (req, res, next) =>{ ...
+}); //standard Express router statement
+
+g app.js
+(bellow similar lines each)
+const users = require('./routes/api/users');
+app.use('/api/users', users);
+ 
+##LEntry 8: Tue 19 Jun 2018 17:13:06 CEST
+ 
+g add peerDependencies to package.json
+npm info "eslint-config-airbnb@15.0.1" peerDependencies
+
+... result in a list that: use the version it gives you. EG::
+npm  add --dev eslint-config-airbnb@15.0.1 eslint@^3.19.0 eslint-plugin-jsx-a11y@^5.0.1 eslint-plugin-import@^2.2.0 eslint-plugin-react@^7.0.1
+ 
+##LEntry 9: Tue 19 Jun 2018 17:16:04 CEST
+ 
+g vim .eslintrc at top level dir, and import AirBnB’s settings:
+{ "extends": "airbnb" }
+ 
+ 
+ 
+##LEntry 10: Tue 19 Jun 2018 20:25:40 CEST
+ 
+sudo npm -g  add eslint-config-airbnb@15.0.1 eslint@^3.19.0 eslint-plugin-jsx-a11y@^5.0.1 eslint-plugin-import@^2.2.0 eslint-plugin-react@^7.0.1
+ 
+##LEntry 11: Tue 19 Jun 2018 20:37:32 CEST
+ 
+Por mi propia cuenta, instalo peer dependencies by:
+g add peer deps section to pasckage,json
+g manual install 2 vers of eslint
+ 
+##LEntry 12: Tue 19 Jun 2018 20:43:16 CEST
+ 
+g reedit package.json: "lint": "eslint ."
+ 
+##LEntry 13: Tue 19 Jun 2018 21:11:47 CEST
+ 
+RECAP:
+
+- database set up
+- testing ready to go
+- API responding to calls to its endpoint
+- established good coding practices via linting
+- github repo set up
+- prepared our site for user authentication
+
+ 
+##LEntry 14: Wed 20 Jun 2018 12:02:06 CEST
+g Install react, babel, webpack
+react@16.1.1 react-dom@16.1.1 webpack@3.4.1 babel-loader@7.0.0 babel-core@6.24.1 babel-jest@20.0.3 babel-preset-react@6.24.1 sass-loader@6.0.6 node-sass@4.5.3
+ 
+-- da pila de errores
+g instalo una peer: webpack@2.7.0
+En particular: node-sass @4.5.3 or @latest (el 4.9.0)
+Hago $' sudo npm update node-sass@latest '$ y como si nada
